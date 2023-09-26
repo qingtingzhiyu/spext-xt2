@@ -7,15 +7,15 @@
 'use strict';
 import _default from './constants.mjs';
 const { TARGETED_PLATFORMS, LATEST_JRE } = _default;
-import downloadJre from './jreDownload.mjs';
+// import downloadJre from './jreDownload.mjs';
 import { cleanJreDir } from './fsUtils.mjs';
 import { createVSIX } from 'vsce';
 
 (async () => {
 	for (const platform of TARGETED_PLATFORMS) {
-		await downloadJre(platform, LATEST_JRE);
+		// await downloadJre(platform, LATEST_JRE);
 		await createVSIX({ target: platform });
 	}
-	cleanJreDir();
+	// cleanJreDir();
 	await createVSIX();
 })();

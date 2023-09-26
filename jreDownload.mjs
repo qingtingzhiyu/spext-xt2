@@ -35,78 +35,16 @@ export default async function downloadJre(targetPlatform, javaVersion) {
 		return;
 	}
 
-	// info(`Downloading justj JRE ${javaVersion} for the platform ${targetPlatform} ...`);
-
-	// const manifestUrl = `https://download.eclipse.org/justj/jres/${javaVersion}/downloads/latest/justj.manifest`;
-	// // Download justj.manifest file
-	// const manifest = await new Promise(function (resolve, reject) {
-	// 	fetch(manifestUrl).then(response => {
-	// 		const BAD_REQUEST_STATUS_CODE = 400;
-	// 		if (!response.ok || response.status >= BAD_REQUEST_STATUS_CODE) {
-	// 			reject(response.error || `${response.status} returned from ${manifestUrl}`);
-	// 		} else {
-	// 			resolve(response.text());
-	// 		}
-	// 	});
-	// });
-
-	// if (!manifest) {
-	// 	error(`Failed to download justj.manifest, please check if the link ${manifestUrl} is valid.`);
-	// 	return;
+	// let jreVersionLabel = 'SpecCheckerLite_win';
+	// if (targetPlatform === 'linux-x6') {
+	// 	jreVersionLabel = 'SpecCheckerLite_linux';
 	// }
 
-	/**
-	 * Here are the contents for a sample justj.manifest file:
-	 * ../20211012_0921/org.eclipse.justj.openjdk.hotspot.jre.full.stripped-17-linux-aarch64.tar.gz
-	 * ../20211012_0921/org.eclipse.justj.openjdk.hotspot.jre.full.stripped-17-linux-x86_64.tar.gz
-	 * ../20211012_0921/org.eclipse.justj.openjdk.hotspot.jre.full.stripped-17-macosx-aarch64.tar.gz
-	 * ../20211012_0921/org.eclipse.justj.openjdk.hotspot.jre.full.stripped-17-macosx-x86_64.tar.gz
-	 * ../20211012_0921/org.eclipse.justj.openjdk.hotspot.jre.full.stripped-17-win32-x86_64.tar.gz
-	 */
-	// const javaPlatform = platformMapping[targetPlatform];
-	// const list = manifest.split(/\r?\n/);
-	// const jreIdentifier = list.find(value => {
-	// 	return (
-	// 		value.indexOf('org.eclipse.justj.openjdk.hotspot.jre.full.stripped') >= 0 && value.indexOf(javaPlatform) >= 0
-	// 	);
-	// });
-
-	// if (!jreIdentifier) {
-	// 	error(
-	// 		`justj doesn't support the jre ${javaVersion} for the platform ${javaPlatform}
-	//    (${targetPlatform}), please refer to the link ${manifestUrl} for the supported platforms.`
-	// 	);
-	// 	return;
-	// }
-
-	// const jreDownloadUrl = `https://download.eclipse.org/justj/jres/${javaVersion}/downloads/latest/${jreIdentifier}`;
-	// const parsedDownloadUrl = parse(jreDownloadUrl);
-	// const jreFileName = basename(parsedDownloadUrl.pathname).replace(/\.(?:7z|bz2|gz|rar|tar|zip|xz)*$/, '');
-	// const idx = jreFileName.indexOf('-');
-	// const jreVersionLabel = idx >= 0 ? jreFileName.substring(idx + 1) : jreFileName;
-	// // Download justj JRE.
-
-	// await downloadFile(jreDownloadUrl, `./jre/${jreFileName}`);
-
-	// const inputFilePath = `./jre/${jreFileName}`;
-	// const outputFolderPath = './jre/' + jreVersionLabel;
+	// const outputFolderPath = './bin/' + jreVersionLabel;
 	// if (!existsSync(outputFolderPath)) {
 	// 	mkdirSync(outputFolderPath);
 	// }
 
-	// const compressedReadStream = createReadStream(inputFilePath);
-	// const decompressionStream = createGunzip();
-	// const extractionStream = extract({
-	// 	cwd: outputFolderPath // Set the current working directory for extraction
-	// });
-	// compressedReadStream.pipe(decompressionStream).pipe(extractionStream);
-	// extractionStream.on('finish', () => {
-	// 	info('Extraction complete.');
-	// 	deleteFile(inputFilePath);
-	// });
-	// compressedReadStream.on('error', err => error('Error reading compressed file:', err));
-	// decompressionStream.on('error', err => error('Error decompressing:', err));
-	// extractionStream.on('error', err => error('Error extracting:', err));
 }
 
 function isValidParams(targetPlatform, platformMapping) {
@@ -123,13 +61,3 @@ function isValidParams(targetPlatform, platformMapping) {
 	return true;
 }
 
-async function downloadFile(fileUrl, destPath) {
-	return new Promise(function (resolve, reject) {
-		fetch(fileUrl).then(function (res) {
-			const fileStream = createWriteStream(destPath);
-			res.body.on('error', reject);
-			fileStream.on('finish', resolve);
-			res.body.pipe(fileStream);
-		});
-	});
-}

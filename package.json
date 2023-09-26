@@ -1,8 +1,8 @@
 {
-  "name": "spext-xt-plugin",
-  "displayName": "spext-xt1",
-  "description": "spext-xt2",
-  "version": "0.0.5",
+  "name": "spext-xt-plugin1",
+  "displayName": "spext-xt11",
+  "description": "spext-xt21",
+  "version": "0.0.1",
   "publisher": "spext1",
   "engines": {
     "vscode": "^1.80.0"
