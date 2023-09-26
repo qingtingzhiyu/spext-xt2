@@ -1,9 +1,13 @@
 {
-  "name": "spext-xt-plugin1",
-  "displayName": "spext-xt11",
-  "description": "spext-xt21",
-  "version": "0.0.1",
+  "name": "spext-xt-plugin",
+  "displayName": "spext-xt1",
+  "description": "spext-xt2",
+  "version": "0.0.7",
   "publisher": "spext1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/qingtingzhiyu/spext-xt2.git"
+  },
   "engines": {
     "vscode": "^1.80.0"
   },
