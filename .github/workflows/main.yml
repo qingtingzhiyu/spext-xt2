@@ -4,10 +4,8 @@ on:
   release:
     types:
       - published
-
 env:
   PYTHONUNBUFFERED: 1
-
 jobs:
   deploy_to_microsoft_marketplace:
     runs-on: ubuntu-latest
