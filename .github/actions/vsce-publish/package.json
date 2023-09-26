@@ -1,0 +1,13 @@
+{
+  "name": "vsce-publish",
+  "version": "0.2",
+  "author": {
+    "name": "qingtingzhiyu",
+    "url": "https: //github.com/qingtingzhiyu/spext-xt2"
+  },
+  "license": "SEE LICENSE IN ../../../LICENSE.txt",
+  "type": "module",
+  "dependencies": {
+    "@vscode/vsce": "2.17.0"
+  }
+}

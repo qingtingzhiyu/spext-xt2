@@ -1,0 +1,6 @@
+name: vsce-publish
+author: qingtingzhiyu
+description: Publish spext-xt-plugin to VS marketplace
+runs:
+  using: node16
+  main: main.js
