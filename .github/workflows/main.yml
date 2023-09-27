@@ -1,3 +1,4 @@
+name: spext-release
 on:
   push:
     branches:
