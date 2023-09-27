@@ -8,14 +8,6 @@ on:
 env:
   PYTHONUNBUFFERED: 1
 
-jobs:
-  release:
-    permissions:
-      id-token: write
-      contents: write
-    uses: ./.github/workflows/a.yml
-    with:
-      publishToBinaries: false
-      mavenCentralSync: false
+
 
 
