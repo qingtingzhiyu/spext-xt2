@@ -13,6 +13,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    uses: a.yml
     with:
       publishToBinaries: false
       mavenCentralSync: false
