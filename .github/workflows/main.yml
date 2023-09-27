@@ -13,7 +13,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
-    uses: .github/workflows/a.yml
+    uses:[]
     with:
       publishToBinaries: false
       mavenCentralSync: false
