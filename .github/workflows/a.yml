@@ -1,0 +1,99 @@
+# yamllint disable rule:line-length
+---
+name: Release
+on:
+  workflow_call:
+    inputs:
+      dryRun:
+        type: boolean
+        description: Flag to enable the dry-run execution
+        default: false
+        required: false
+      publishToBinaries:
+        type: boolean
+        description: Flag to enable the publication to binaries
+        default: false
+        required: false
+      binariesS3Bucket:
+        type: string
+        description: Target bucket
+        default: downloads-cdn-eu-central-1-prod
+        required: false
+      vaultAddr:
+        type: string
+        description: Custom vault installation
+        required: false
+      artifactoryRoleSuffix:
+        type: string
+        description: Artifactory promoter suffix specified in Vault repo config
+        default: promoter
+        required: false
+      mavenCentralSync:
+        type: boolean
+        description: Enable synchronization to Maven Central
+        default: false
+        required: false
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write  # to authenticate via OIDC
+      contents: write  # to revert a github release
+    timeout-minutes: 30
+    if: ${{ github.event_name == 'release' && github.event.action == 'published' }}
+    outputs:
+      releasability: ${{ steps.release.outputs.releasability }}
+      promote: ${{ steps.release.outputs.promote }}
+      publish_to_binaries: ${{ steps.release.outputs.publish_to_binaries }}
+      release: ${{ steps.release.outputs.release }}
+    steps:
+      - name: Vault Secrets
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@f148a1075c1eff1db5ab474f96c206c5587172d3  # tag=2.5.0-3
+        with:
+          url: ${{ inputs.vaultAddr }}
+          secrets: |
+            development/artifactory/token/{REPO_OWNER_NAME_DASH}-${{ inputs.artifactoryRoleSuffix }} access_token | artifactory_access_token;
+            development/kv/data/slack token | slack_api_token;
+            development/kv/data/repox url | artifactory_url;
+            development/kv/data/burgr github_username | burgrx_username;
+            development/kv/data/burgr github_password | burgrx_password;
+            development/aws/sts/downloads access_key | binaries_aws_access_key_id;
+            development/aws/sts/downloads secret_key | binaries_aws_secret_access_key;
+            development/aws/sts/downloads security_token | binaries_aws_security_token;
+      - name: Release
+        id: release
+        uses: SonarSource/gh-action_release/main@8c85ff24955eda4c81938fd8c45943ccc8974c68 # 5.0.14
+        with:
+          publish_to_binaries: ${{ inputs.publishToBinaries }}  # Used only if the binaries are delivered to customers
+          dry_run: ${{ inputs.dryRun }}
+        env:
+          PYTHONUNBUFFERED: 1
+          ARTIFACTORY_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).artifactory_access_token }}
+          BINARIES_AWS_DEPLOY: ${{ inputs.binariesS3Bucket }}  # Required for pushing the binaries
+          BURGRX_USER: ${{ fromJSON(steps.secrets.outputs.vault).burgrx_username }}
+          BURGRX_PASSWORD: ${{ fromJSON(steps.secrets.outputs.vault).burgrx_password }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_API_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).slack_api_token }}
+          AWS_ACCESS_KEY_ID: ${{ fromJSON(steps.secrets.outputs.vault).binaries_aws_access_key_id }}
+          AWS_SECRET_ACCESS_KEY: ${{ fromJSON(steps.secrets.outputs.vault).binaries_aws_secret_access_key }}
+          AWS_SESSION_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).binaries_aws_security_token }}
+          AWS_DEFAULT_REGION: eu-central-1
+      - name: Release action results
+        if: always()
+        run: |
+          echo "${{ steps.release.outputs.releasability }}"
+          echo "${{ steps.release.outputs.promote }}"
+          echo "${{ steps.release.outputs.publish_to_binaries }}"
+          echo "${{ steps.release.outputs.release }}"
+
+  mavenCentral:
+    name: Maven Central
+    needs: release
+    if: ${{ inputs.mavenCentralSync && inputs.dryRun != true }}
+    uses: SonarSource/gh-action_release/.github/workflows/maven-central.yaml@8c85ff24955eda4c81938fd8c45943ccc8974c68 # 5.0.14
+    with:
+      vaultAddr: ${{ inputs.vaultAddr }}
+      artifactoryRoleSuffix: ${{ inputs.artifactoryRoleSuffix }}
