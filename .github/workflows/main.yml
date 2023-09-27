@@ -118,10 +118,3 @@ jobs:
         run: |
           curl -s -o ${{ steps.extract_version.outputs.artifactName }} ${{ steps.extract_version.outputs.artifactUrl }}
           echo 'artifactFile='$(pwd)/${{ steps.extract_version.outputs.artifactName }} >> ${GITHUB_OUTPUT}
-      - name: Publish to OpenVSX
-        if: success()
-        id: ovsx_publish
-        env:
-          ARTIFACT_FILE: ${{ steps.download_artifact.outputs.artifactFile }}
-          OPENVSX_TOKEN: ${{ secrets.OPENVSX_TOKEN }}
-        uses: ./.github/actions/ovsx-publish
